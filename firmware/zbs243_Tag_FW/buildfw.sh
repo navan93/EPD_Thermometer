@@ -17,18 +17,5 @@ make BUILD=zbs29_ssd1619 CPU=8051 SOC=zbs243 > /dev/null
 mv main.bin ${BINDIR}/SOLUM_29_SSD1619-01-${VER}.bin -v
 make clean > /dev/null
 
-echo -e "\n\nBuilding 4.2 version..."
-make BUILD=zbs42_ssd1619 CPU=8051 SOC=zbs243 > /dev/null
-mv main.bin ${BINDIR}/SOLUM_42_SSD1619-02-${VER}.bin -v
-make clean > /dev/null
 
-echo -e "\n\nBuilding 2.9 (UC8151) version..."
-make BUILD=zbs29_uc8151 CPU=8051 SOC=zbs243 > /dev/null
-mv main.bin ${BINDIR}/SOLUM_29_UC8151-11-${VER}.bin -v
-make clean > /dev/null
-
-echo -e "\n\nBuilding 2.9 BW (SSD1619 - freezer) version..."
-make BUILD=zbs29_BW_ssd1619 CPU=8051 SOC=zbs243 > /dev/null
-mv main.bin ${BINDIR}/SOLUM_29_BW_LOWTEMP-21-${VER}.bin -v
-make clean > /dev/null
 
