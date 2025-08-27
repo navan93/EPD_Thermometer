@@ -1,26 +1,13 @@
 #define __packed
 #include "config.h"
-#include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <string.h>
 
-#include "asmUtil.h"
 #include "powermgt.h"
 #include "printf.h"
 
-#include "timer.h"
 #include "wdt.h"
 
-#include "flash.h"
 
-#include "uart.h"
-
-
-void executeCommand(uint8_t cmd) {
-    (void)cmd;
-}
 
 void main() {
     setupPortsInitial();

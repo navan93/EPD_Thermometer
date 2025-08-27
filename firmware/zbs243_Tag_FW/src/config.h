@@ -7,6 +7,7 @@
 #define EPD_ENABLED     0
 #define EEPROM_ENABLED  0
 #define AESCCM_ENABLED  0
-
+#define BUILT_IN_TEMPERATURE_ENABLED 0
+#define SPI_ENABLED     0
 
 #endif

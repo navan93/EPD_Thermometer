@@ -1,52 +1,48 @@
 
 BUILD		?= zbs154_ssd1619
 
-#file containing main() must be first!
-SOURCES		+= src/main.c
-SOURCES		+= src/powermgt.c
-
+SOC = zbs243
+CPU = 8051
 
 FLAGS += -Iboard/$(BUILD)
 FLAGS += -Isoc/$(SOC)
 FLAGS += -Icpu/$(CPU)
 FLAGS += -Isrc/
-FLAGS += -Iboard/$(BUILD)
-
-FLAGS += -Icpu/8051
-
-FLAGS += -mmcs51 --std-c2x --opt-code-size --peep-file cpu/8051/peep.def --fomit-frame-pointer
-SOURCES += cpu/8051/asmUtil.c
-CC = sdcc
-FLAGS += -Isoc/zbs243
-
+FLAGS += -mmcs51 --std-c2x --opt-code-size --peep-file cpu/$(CPU)/peep.def --fomit-frame-pointer
 FLAGS += -DSOC_ZBS243 --xram-loc 0xe000 --xram-size 0x2000 --model-large
+FLAGS += --code-size 0xfc00
+# 0xfc00 and not 0x10000 to leave some space for update header and updater in flash
 
+#file containing main() must be first!
+# App source
+SOURCES	+= src/main.c
+SOURCES	+= src/powermgt.c
+# SOURCES += src/md5.c
+
+# CPU source
+# SOURCES += cpu/$(CPU)/asmUtil.c
+SOURCES += cpu/$(CPU)/cpu.c
+SOURCES += cpu/$(CPU)/printf.c
+
+# SOC source
 SOURCES += soc/zbs243/soc.c
 SOURCES += soc/zbs243/wdt.c
 SOURCES += soc/zbs243/sleep.c
-SOURCES += soc/zbs243/spi.c
+# SOURCES += soc/zbs243/spi.c
 SOURCES += soc/zbs243/uart.c
 SOURCES += soc/zbs243/timer.c
 # SOURCES += soc/zbs243/radio.c
-SOURCES += soc/zbs243/flash.c
-SOURCES += soc/zbs243/temperature.c
+# SOURCES += soc/zbs243/flash.c
+# SOURCES += soc/zbs243/temperature.c
 # SOURCES += cpu/8051/random.c
 # SOURCES += cpu/8051/aes.c
-SOURCES += cpu/8051/printf.c
-SOURCES += soc/zbs243/i2c.c
-CPU = 8051
-FLAGS += --code-size 0xfc00
+# SOURCES += soc/zbs243/i2c.c
 
-SOC = zbs243
-
-BARCODE = datamatrix
-
-# 0xfc00 and not 0x10000 to leave some space for update header and updater in flash
-
-SOURCES += cpu/$(CPU)/cpu.c
-SOURCES += board/$(BUILD)/board.c
+# Board source
+# SOURCES += board/$(BUILD)/board.c
 # SOURCES += board/$(BUILD)/screen.c
-# SOURCES += md5.c
+
+CC = sdcc
 
 OUTPUT_NAME = EPD_Thermometer_$(BUILD)
 BUILD_DIR = .build

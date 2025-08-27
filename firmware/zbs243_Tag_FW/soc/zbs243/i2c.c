@@ -3,6 +3,9 @@
 #include "printf.h"
 #include "uart.h"
 #include "zbs243.h"
+#include "config.h"
+
+#if I2C_ENABLED
 
 static volatile struct I2cTransaction __xdata *__xdata mCurTrans;
 static volatile uint8_t __xdata mNumTrans;
@@ -124,3 +127,5 @@ enum I2cResult i2cTransact(struct I2cTransaction __xdata *trans, uint8_t nTrans)
     }
     return mResult;
 }
+
+#endif

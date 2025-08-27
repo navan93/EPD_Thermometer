@@ -17,18 +17,18 @@
 #include "uart.h"  // for initUart
 #include "wdt.h"
 
+#if RADIO_ENABLED
 uint16_t __xdata dataReqAttemptArr[POWER_SAVING_SMOOTHING] = {0};  // Holds the amount of attempts required per data_req/check-in
 uint8_t __xdata dataReqAttemptArrayIndex = 0;
 uint8_t __xdata dataReqLastAttempt = 0;
 uint16_t __xdata nextCheckInFromAP = 0;
 uint8_t __xdata wakeUpReason = 0;
 uint8_t __xdata scanAttempts = 0;
+#endif
 
 int8_t __xdata temperature = 0;
 uint16_t __xdata batteryVoltage = 2600;
 bool __xdata lowBattery = false;
-uint16_t __xdata longDataReqCounter = 0;
-uint16_t __xdata voltageCheckCounter = 0;
 
 uint8_t __xdata capabilities = 0;
 
@@ -53,12 +53,7 @@ void setupPortsInitial() {
     P2PULL = 0x00;
 }
 
-void initPowerSaving(const uint16_t initialValue) {
-    for (uint8_t c = 0; c < POWER_SAVING_SMOOTHING; c++) {
-        dataReqAttemptArr[c] = initialValue;
-    }
-}
-
+#if SPI_ENABLED
 static void configSPI(const bool setup) {
     if (setup == spiActive) return;
     if (setup) {
@@ -81,7 +76,9 @@ static void configSPI(const bool setup) {
     }
     spiActive = setup;
 }
+#endif
 
+#if UART_ENABLED
 static void configUART(const bool setup) {
     if (uartActive == setup) return;
     if (setup) {
@@ -95,6 +92,7 @@ static void configUART(const bool setup) {
     }
     uartActive = setup;
 }
+#endif
 
 #if EEPROM_ENABLED
 static void configEEPROM(const bool setup) {
@@ -124,6 +122,7 @@ static void configEEPROM(const bool setup) {
 }
 #endif // EEPROM_ENABLED
 
+#if I2C_ENABLED
 static void configI2C(const bool setup) {
     if (setup == i2cActive) return;
     if (setup) {
@@ -144,8 +143,10 @@ static void configI2C(const bool setup) {
     }
     i2cActive = setup;
 }
+#endif
 
-void powerUp(const uint8_t parts) {
+void powerUp(const uint8_t parts)
+{
     if (parts & INIT_BASE) {
         clockingAndIntsInit();
         timerInit();
@@ -154,7 +155,7 @@ void powerUp(const uint8_t parts) {
         wdt10s();
     }
 
-#if EPD_ENABLED
+#if EPD_ENABLED && SPI_ENABLED
     if (parts & INIT_EPD) {
         configSPI(true);
         epdConfigGPIO(true);
@@ -175,9 +176,11 @@ void powerUp(const uint8_t parts) {
     }
 #endif // EPD_ENABLED
 
+#if UART_ENABLED
     if (parts & INIT_UART) {
         configUART(true);
     }
+#endif
 
 #if EEPROM_ENABLED
     if (parts & INIT_EEPROM) {
@@ -186,9 +189,11 @@ void powerUp(const uint8_t parts) {
     }
 #endif // EEPROM_ENABLED
 
+#if BUILT_IN_TEMPERATURE_ENABLED
     if (parts & INIT_TEMPREADING) {
         temperature = adcSampleTemperature();
     }
+#endif // BUILT_IN_TEMPERATURE_ENABLED
 #if RADIO_ENABLED
     if (parts & INIT_RADIO) {
         radioInit();
@@ -201,15 +206,20 @@ void powerUp(const uint8_t parts) {
         }
     }
 #endif
+#if I2C_ENABLED
     if (parts & INIT_I2C) {
         configI2C(true);
     }
+#endif
 }
 
-void powerDown(const uint8_t parts) {
+void powerDown(const uint8_t parts)
+{
+#if UART_ENABLED
     if (parts & INIT_UART) {
         configUART(false);
     }
+#endif
 #if RADIO_ENABLED
     if (parts & INIT_RADIO) {  // warning; this also touches some stuff about the EEPROM, apparently. Re-init EEPROM afterwards
         radioRxEnable(false, true);
@@ -244,9 +254,11 @@ void powerDown(const uint8_t parts) {
         configSPI(false);
     }
 #endif // EPD_ENABLED || EEPROM_ENABLED
+#if I2C_ENABLED
     if (parts & INIT_I2C) {
         configI2C(false);
     }
+#endif
 }
 
 void doSleep(const uint32_t __xdata t) {
@@ -352,6 +364,7 @@ void doVoltageReading() {
     powerDown(INIT_RADIO);
 }
 
+#if RADIO_ENABLED
 uint32_t getNextScanSleep(const bool increment) {
     if (increment) {
         if (scanAttempts < 255)
@@ -387,3 +400,11 @@ uint16_t getNextSleep() {
     // if (avg < tagSettings.minimumCheckInTime) return tagSettings.minimumCheckInTime;
     return avg;
 }
+
+void initPowerSaving(const uint16_t initialValue) {
+    for (uint8_t c = 0; c < POWER_SAVING_SMOOTHING; c++) {
+        dataReqAttemptArr[c] = initialValue;
+    }
+}
+
+#endif
