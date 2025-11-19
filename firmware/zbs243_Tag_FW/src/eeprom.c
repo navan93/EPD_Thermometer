@@ -1,0 +1,3 @@
+
+__bit eepromInit(void) {
+}

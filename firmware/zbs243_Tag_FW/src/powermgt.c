@@ -10,7 +10,7 @@
 #include "asmUtil.h"
 #include "board.h"
 #include "cpu.h"
-// #include "eeprom.h"
+#include "eeprom.h"
 #include "printf.h"
 #include "sleep.h"
 #include "timer.h"

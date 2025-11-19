@@ -1,11 +1,11 @@
 #include "uart.h"
 
 #include "cpu.h"
-
-#ifdef AP_FW
 #include "stdbool.h"
 #include "string.h"
-#endif
+
+
+#include "function_signatures.h"
 
 void uartInit(void) {
     // clock it up
@@ -21,11 +21,4 @@ void uartInit(void) {
     UARTBRGL = 0x8A;  // config for 115200
 #endif
     UARTSTA = 0x12;  // also set the "empty" bit else we wait forever for it to go up
-}
-
-void uartTx(uint8_t val) {
-    while (!(UARTSTA & (1 << 1)))
-        ;
-    UARTSTA &= ~(1 << 1);
-    UARTBUF = val;
 }
